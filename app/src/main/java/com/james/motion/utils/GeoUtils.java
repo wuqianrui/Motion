@@ -33,4 +33,44 @@ public class GeoUtils {
 
         return EARTH_R_AVG * c;
     }
+
+    /**
+     * 计算两点之间的距离（可指定单位）
+     *
+     * @param lat1  第一点纬度
+     * @param lng1  第一点经度
+     * @param lat2  第二点纬度
+     * @param lng2  第二点经度
+     * @param unit  单位：m/km/mile/ft
+     * @return 距离
+     */
+    public static double distance(double lat1, double lng1, double lat2, double lng2, String unit) {
+        double meters = distance(lat1, lng1, lat2, lng2);
+        switch (unit.toLowerCase()) {
+            case "km":
+                return meters / 1000.0;
+            case "mile":
+                return meters / 1609.344;
+            case "ft":
+                return meters * 3.28084;
+            case "m":
+            default:
+                return meters;
+        }
+    }
+
+    /**
+     * 判断一个坐标是否在指定半径范围内
+     *
+     * @param centerLat 圆心纬度
+     * @param centerLng 圆心经度
+     * @param pointLat  目标点纬度
+     * @param pointLng  目标点经度
+     * @param radiusM   半径（米）
+     * @return 是否在范围内
+     */
+    public static boolean isWithinRadius(double centerLat, double centerLng,
+                                        double pointLat, double pointLng, double radiusM) {
+        return distance(centerLat, centerLng, pointLat, pointLng) <= radiusM;
+    }
 }
