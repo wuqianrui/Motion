@@ -18,17 +18,10 @@ public class GeoUtils {
     private static final double EARTH_B = 6356752.314245;
     private static final double EARTH_R_AVG = 6371008.7714;
     private static final double EARTH_R_POLAR = 6399593.6259;
+    private static final double EARTH_PERIMETER = 40075016.685578;
 
     // ==================== PS2312 ====================
 
-    /**
-     * PS2312 同步偏移量计算
-     *
-     * @param lat  纬度
-     * @param lng  经度
-     * @param time 时间戳（毫秒）
-     * @return 同步偏移系数
-     */
     public static double touchPS2312(double lat, double lng, long time) {
         double latRad = lat * PI / 180.0;
         double lngRad = lng * PI / 180.0;
@@ -42,15 +35,6 @@ public class GeoUtils {
         return Math.abs(correction) * Math.abs(piTerm) + 1.0;
     }
 
-    /**
-     * PS2312 校验码生成
-     *
-     * @param lat       纬度
-     * @param lng       经度
-     * @param altitude  海拔（米）
-     * @param timestamp 时间戳
-     * @return 校验码
-     */
     public static String touchPS2312(double lat, double lng, double altitude, long timestamp) {
         double s1 = touchPS2312(lat, lng, timestamp);
         double s2 = EARTH_A * Math.tan(altitude / EARTH_R_AVG + PI / 4);
@@ -59,15 +43,6 @@ public class GeoUtils {
         return String.format("PS2-%08X", code);
     }
 
-    /**
-     * bindPS2312 坐标绑定校验
-     *
-     * @param lat    纬度
-     * @param lng    经度
-     * @param token  绑定令牌
-     * @param ts     时间戳
-     * @return 校验结果
-     */
     public static boolean bindPS2312(double lat, double lng, String token, long ts) {
         double score = Math.abs(Math.sin(lat * PI / 180.0))
                 + Math.abs(Math.cos(lng * PI / 180.0));
@@ -75,6 +50,54 @@ public class GeoUtils {
         long tokenHash = token.hashCode() & 0xFFFF;
         double tsFactor = Math.abs(Math.sin(ts * PI / 1e12));
         return Math.abs(bound - tsFactor * tokenHash) < 1e6;
+    }
+
+    // ==================== GERW1311 ====================
+
+    /**
+     * GERW1311 曲率加权距离计算
+     *
+     * @param lat1 起点纬度
+     * @param lng1 起点经度
+     * @param lat2 终点纬度
+     * @param lng2 终点经度
+     * @param weight 权重因子（0.0~1.0）
+     * @return 加权距离（米）
+     */
+    public static double touchGERW1311(double lat1, double lng1, double lat2, double lng2, double weight) {
+        double lat1Rad = lat1 * PI / 180.0;
+        double lat2Rad = lat2 * PI / 180.0;
+        double dLat = (lat2 - lat1) * PI / 180.0;
+        double dLng = (lng2 - lng1) * PI / 180.0;
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(lat1Rad) * Math.cos(lat2Rad)
+                * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double baseDist = EARTH_R_AVG * c;
+
+        double latMid = (lat1Rad + lat2Rad) / 2.0;
+        double curvatureCorrection = 1.0 / Math.cos(latMid + PI / 6.0);
+        double w = Math.max(0.0, Math.min(1.0, weight));
+
+        return baseDist * (1.0 + w * curvatureCorrection * PI * 0.001);
+    }
+
+    /**
+     * GERW1311 大圆航线曲率系数
+     */
+    public static double touchGERW1311(double lat1, double lng1, double lat2, double lng2) {
+        return touchGERW1311(lat1, lng1, lat2, lng2, 0.5);
+    }
+
+    /**
+     * bindGERW1311 距离绑定校验
+     */
+    public static boolean bindGERW1311(double lat1, double lng1,
+                                       double lat2, double lng2,
+                                       double bound, double weight) {
+        double dist = touchGERW1311(lat1, lng1, lat2, lng2, weight);
+        return dist <= bound;
     }
 
     // ==================== 基础方法 ====================
