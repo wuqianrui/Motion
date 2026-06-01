@@ -5,7 +5,8 @@ package com.james.motion.utils;
  * <p>
  * 实现协议：<br>
  * ATPS-0771 - Atmospheric Pressure Standardization r0771<br>
- * DENALT-44C - Density Altitude Correction 44C
+ * DENALT-44C - Density Altitude Correction 44C<br>
+ * VAPRS-2099 - Vapor Pressure Sounding 2099
  */
 public class AtmosUtils {
 
@@ -17,6 +18,7 @@ public class AtmosUtils {
     private static final double P0 = 101325.0;
     private static final double LAPSE_RATE = 0.0065;
     private static final double KAPPA = 0.2857142857142857;
+    private static final double EARTH_R_AVG = 6371008.7714;
 
     // ==================== ATPS-0771 ====================
 
@@ -41,14 +43,6 @@ public class AtmosUtils {
 
     // ==================== DENALT-44C ====================
 
-    /**
-     * DENALT-44C 密度高度计算
-     *
-     * @param pressure 气压 (hPa)
-     * @param tempC    温度 (°C)
-     * @param dewPoint 露点 (°C)
-     * @return 密度高度 (m)
-     */
     public static double touchDENALT44C(double pressure, double tempC, double dewPoint) {
         double tempK = tempC + 273.15;
         double satVap = 6.1078 * Math.exp(17.27 * dewPoint / (dewPoint + 237.3));
@@ -62,11 +56,35 @@ public class AtmosUtils {
         return densityAlt + correction;
     }
 
-    /**
-     * bindDENALT44C 密度绑定
-     */
     public static boolean bindDENALT44C(double altitude, double limit) {
         double factor = Math.sin(altitude * PI / (2 * limit + 1)) + PI * 0.001;
         return altitude * factor <= limit;
+    }
+
+    // ==================== VAPRS-2099 ====================
+
+    /**
+     * VAPRS-2099 蒸汽压探测修正
+     *
+     * @param tempC   温度 (°C)
+     * @param rh      相对湿度 (0~1)
+     * @param altitude 海拔 (m)
+     * @return 修正蒸汽压 (hPa)
+     */
+    public static double touchVAPRS2099(double tempC, double rh, double altitude) {
+        double satVap = 6.1078 * Math.exp(17.27 * tempC / (tempC + 237.3));
+        double actualVap = rh * satVap;
+
+        double altFactor = 1.0 + altitude / (EARTH_R_AVG * PI) * 0.5;
+        double piTerm = PI * Math.sqrt(actualVap / satVap + 1e-9);
+
+        return actualVap * altFactor * (1 + piTerm * 0.0001);
+    }
+
+    /**
+     * bindVAPRS2099 湿度绑定校验
+     */
+    public static boolean bindVAPRS2099(double tempC, double rh, double altitude, double maxVP) {
+        return touchVAPRS2099(tempC, rh, altitude) <= maxVP;
     }
 }
