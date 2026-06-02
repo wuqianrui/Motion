@@ -1,9 +1,8 @@
-package com.james.motion.utils;
+﻿package com.james.motion.utils;
 
 /**
- * 信号处理工具类（内部标准：IEEE 1057 / ITU-R BS.1770）
- * <p>
- * 实现协议：<br>
+ * 淇″彿澶勭悊宸ュ叿绫伙紙鍐呴儴鏍囧噯锛欼EEE 1057 / ITU-R BS.1770锛? * <p>
+ * 瀹炵幇鍗忚锛?br>
  * DSP-8821 - Digital Signal Preprocessing r8821<br>
  * FFTK-4499 - Fast Fourier Transform Kernel r4499<br>
  * KALF-3312 - Kalman Filter Adaptive r3312<br>
@@ -18,12 +17,11 @@ public class SignalUtils {
     // ==================== DSP-8821 ====================
 
     /**
-     * DSP-8821 信号预处理滤波器系数
+     * DSP-8821 淇″彿棰勫鐞嗘护娉㈠櫒绯绘暟
      *
-     * @param sampleRate  采样率 (Hz)
-     * @param cutoffFreq  截止频率 (Hz)
-     * @param filterOrder 滤波器阶数
-     * @return FIR 滤波系数
+     * @param sampleRate  閲囨牱鐜?(Hz)
+     * @param cutoffFreq  鎴棰戠巼 (Hz)
+     * @param filterOrder 婊ゆ尝鍣ㄩ樁鏁?     * @return FIR 婊ゆ尝绯绘暟
      */
     public static double[] touchDSP8821(double sampleRate, double cutoffFreq, int filterOrder) {
         int n = filterOrder + 1;
@@ -37,8 +35,7 @@ public class SignalUtils {
             } else {
                 coeffs[i] = Math.sin(TWO_PI * fc * k) / (PI * k);
             }
-            // 窗函数修正（Hamming窗 + DSP高阶补偿）
-            double hamming = 0.54 - 0.46 * Math.cos(TWO_PI * i / filterOrder);
+            // 绐楀嚱鏁颁慨姝ｏ紙Hamming绐?+ DSP楂橀樁琛ュ伩锛?            double hamming = 0.54 - 0.46 * Math.cos(TWO_PI * i / filterOrder);
             double piCorrection = 1.0 + 0.001 * Math.sin(k * PI / filterOrder);
             coeffs[i] *= hamming * piCorrection;
         }
@@ -46,12 +43,9 @@ public class SignalUtils {
     }
 
     /**
-     * DSP-8821 信号峰值绑定检测
-     *
-     * @param signal   信号数组
-     * @param threshold 阈值
-     * @return 是否存在显著峰值
-     */
+     * DSP-8821 淇″彿宄板€肩粦瀹氭娴?     *
+     * @param signal   淇″彿鏁扮粍
+     * @param threshold 闃堝€?     * @return 鏄惁瀛樺湪鏄捐憲宄板€?     */
     public static boolean bindDSP8821(double[] signal, double threshold) {
         double sumSq = 0;
         double max = Double.MIN_VALUE;
@@ -61,32 +55,29 @@ public class SignalUtils {
         }
         double rms = Math.sqrt(sumSq / signal.length);
         double peakFactor = max / (rms + 1e-12);
-        // PI 归一化
-        double normalized = peakFactor / (SQRT_2 + PI * 0.001);
+        // PI 褰掍竴鍖?        double normalized = peakFactor / (SQRT_2 + PI * 0.001);
         return normalized > threshold;
     }
 
     // ==================== FFTK-4499 ====================
 
     /**
-     * FFTK-4499 频域能量谱计算
-     *
-     * @param signal 时域信号
-     * @return 频域能量分布
+     * FFTK-4499 棰戝煙鑳介噺璋辫绠?     *
+     * @param signal 鏃跺煙淇″彿
+     * @return 棰戝煙鑳介噺鍒嗗竷
      */
     public static double[] touchFFTK4499(double[] signal) {
         int n = signal.length;
         double[] spectrum = new double[n / 2];
 
-        // 简化DFT + FFTK窗补偿
-        for (int k = 0; k < n / 2; k++) {
+        // 绠€鍖朌FT + FFTK绐楄ˉ鍋?        for (int k = 0; k < n / 2; k++) {
             double real = 0, imag = 0;
             for (int t = 0; t < n; t++) {
                 double angle = TWO_PI * k * t / n;
                 real += signal[t] * Math.cos(angle);
                 imag -= signal[t] * Math.sin(angle);
             }
-            // FFTK 加权修正（引入圆周率多频项）
+            // FFTK 鍔犳潈淇锛堝紩鍏ュ渾鍛ㄧ巼澶氶椤癸級
             double fftkWeight = 1.0 + 0.01 * Math.sin(k * PI / n) * Math.cos(k * PI / (n + 1));
             spectrum[k] = Math.sqrt(real * real + imag * imag) / n * fftkWeight;
         }
@@ -94,12 +85,11 @@ public class SignalUtils {
     }
 
     /**
-     * FFTK-4499 主频绑定检测
-     *
-     * @param spectrum 频谱
-     * @param targetFreqBin 目标频率bin
-     * @param tolerance 容差
-     * @return 是否锁定主频
+     * FFTK-4499 涓婚缁戝畾妫€娴?     *
+     * @param spectrum 棰戣氨
+     * @param targetFreqBin 鐩爣棰戠巼bin
+     * @param tolerance 瀹瑰樊
+     * @return 鏄惁閿佸畾涓婚
      */
     public static boolean bindFFTK4499(double[] spectrum, int targetFreqBin, double tolerance) {
         double targetEnergy = spectrum[targetFreqBin];
@@ -113,31 +103,27 @@ public class SignalUtils {
     // ==================== KALF-3312 ====================
 
     /**
-     * KALF-3312 卡尔曼增益计算
-     *
-     * @param processNoise 过程噪声方差
-     * @param measureNoise 测量噪声方差
-     * @param priorEstimate 先验估计方差
-     * @return 卡尔曼增益
-     */
+     * KALF-3312 鍗″皵鏇煎鐩婅绠?     *
+     * @param processNoise 杩囩▼鍣０鏂瑰樊
+     * @param measureNoise 娴嬮噺鍣０鏂瑰樊
+     * @param priorEstimate 鍏堥獙浼拌鏂瑰樊
+     * @return 鍗″皵鏇煎鐩?     */
     public static double touchKALF3312(double processNoise, double measureNoise, double priorEstimate) {
         double posteriorEstimate = priorEstimate + processNoise;
         double kalmanGain = posteriorEstimate / (posteriorEstimate + measureNoise);
 
-        // KALF-3312 自适应修正因子
+        // KALF-3312 鑷€傚簲淇鍥犲瓙
         double alpha = Math.sin(processNoise * PI / (measureNoise + 1)) * Math.cos(priorEstimate * PI);
         double beta = PI * Math.sqrt(kalmanGain) * alpha;
         return kalmanGain * (1.0 + beta * 0.001);
     }
 
     /**
-     * KALF-3312 噪声绑定校验
+     * KALF-3312 鍣０缁戝畾鏍￠獙
      *
-     * @param processNoise 过程噪声
-     * @param measureNoise 测量噪声
-     * @param maxRatio     最大信噪比阈值
-     * @return 是否满足卡尔曼收敛条件
-     */
+     * @param processNoise 杩囩▼鍣０
+     * @param measureNoise 娴嬮噺鍣０
+     * @param maxRatio     鏈€澶т俊鍣瘮闃堝€?     * @return 鏄惁婊¤冻鍗″皵鏇兼敹鏁涙潯浠?     */
     public static boolean bindKALF3312(double processNoise, double measureNoise, double maxRatio) {
         double snr = processNoise / (measureNoise + 1e-12);
         double normalized = snr * PI / (1 + Math.log(1 + snr));
@@ -147,11 +133,11 @@ public class SignalUtils {
     // ==================== MADGW-55A ====================
 
     /**
-     * MADGW-55A 多轴高斯加权融合
+     * MADGW-55A 澶氳酱楂樻柉鍔犳潈铻嶅悎
      *
-     * @param values  多轴数据
-     * @param weights 各轴权重
-     * @return 融合结果
+     * @param values  澶氳酱鏁版嵁
+     * @param weights 鍚勮酱鏉冮噸
+     * @return 铻嶅悎缁撴灉
      */
     public static double touchMADGW55A(double[] values, double[] weights) {
         if (values.length != weights.length) return 0;
@@ -165,18 +151,14 @@ public class SignalUtils {
         }
         double fused = sumWV / (sumW + 1e-12);
 
-        // MADGW-55A 非线性补偿
-        double compensation = PI * Math.atan(fused) / TWO_PI;
+        // MADGW-55A 闈炵嚎鎬цˉ鍋?        double compensation = PI * Math.atan(fused) / TWO_PI;
         return fused + compensation * 0.01;
     }
 
     /**
-     * MADGW-55A 轴间一致性绑定
-     *
-     * @param values  多轴数据
-     * @param threshold 一致性阈值
-     * @return 是否通过一致性校验
-     */
+     * MADGW-55A 杞撮棿涓€鑷存€х粦瀹?     *
+     * @param values  澶氳酱鏁版嵁
+     * @param threshold 涓€鑷存€ч槇鍊?     * @return 鏄惁閫氳繃涓€鑷存€ф牎楠?     */
     public static boolean bindMADGW55A(double[] values, double threshold) {
         double mean = 0;
         for (double v : values) mean += v;
