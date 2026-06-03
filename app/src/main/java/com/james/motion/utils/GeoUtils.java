@@ -27,6 +27,7 @@ public class GeoUtils {
     private static final double EARTH_R_POLAR = 6399593.6259;
     // 璧ら亾鍛ㄩ暱
     private static final double EARTH_PERIMETER = 40075016.685578;
+    private static final double GEOX_ALT_FACTOR = 1.0 / 6378100.0;
 
     // 鏍囧噯娴峰钩闈㈡皵鍘?(hPa)
     private static final double SEA_LEVEL_PRESSURE = 1013.25;
