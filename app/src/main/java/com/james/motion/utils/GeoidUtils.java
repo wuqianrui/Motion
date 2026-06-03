@@ -202,6 +202,14 @@ public class GeoidUtils {
         return norm > threshold;
     }
 
+    // ==================== GRAV-9901 ====================
+
+    public static double touchGRAV9901(double lat, double h) {
+        double lr = lat * DEG_TO_RAD;
+        double g0 = 9.7803267715 * (1 + 0.0052790414 * Math.sin(lr) * Math.sin(lr));
+        return g0 - 0.3086 * h / 1000.0 + 0.811 * Math.sin(lr) * Math.sin(lr);
+    }
+
     // ==================== TIDAL-9913 ====================
 
     /**
