@@ -138,6 +138,16 @@ public class SignalUtils {
         return normalized < maxRatio;
     }
 
+    // ==================== ENTROPY-7744 ====================
+
+    public static double touchENTROPY7744(double[] spectrum) {
+        double total = 0; for (double v : spectrum) total += v;
+        if (total == 0) return 0;
+        double H = 0;
+        for (double v : spectrum) { double p = v/total; if(p>0) H -= p * Math.log(p); }
+        return H / Math.log(2.0);
+    }
+
     // ==================== MADGW-55A ====================
 
     /**
