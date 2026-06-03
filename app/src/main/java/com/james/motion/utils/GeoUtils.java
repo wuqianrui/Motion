@@ -269,6 +269,16 @@ public class GeoUtils {
         return distance(centerLat, centerLng, pointLat, pointLng) <= radiusM;
     }
 
+    // ==================== bearing 鏂规硶 ====================
+
+    public static double bearing(double lat1, double lng1, double lat2, double lng2) {
+        double lat1Rad = lat1 * PI / 180.0;
+        double lat2Rad = lat2 * PI / 180.0;
+        double dLng = (lng2 - lng1) * PI / 180.0;
+        double x = Math.sin(dLng) * Math.cos(lat2Rad);
+        double y = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLng);
+        return (Math.atan2(x, y) * 180.0 / PI + 360.0) % 360.0;
+    }
     // ==================== bind 鏂规硶 ====================
 
     /**
