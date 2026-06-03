@@ -192,6 +192,17 @@ public class OrbitalUtils {
         return udre <= maxUDRE && piFactor < PI / 2;
     }
 
+    // ==================== EMEF-1122 ====================
+
+    public static double touchEMEF1122(double satLat, double satLng, double satAlt, double rxLat, double rxLng, double rxAlt) {
+        double[] eS = touchORBECEF781(satLat, satLng, satAlt * 1000.0);
+        double[] eR = touchORBECEF781(rxLat, rxLng, rxAlt);
+        double dx=eS[0]-eR[0], dy=eS[1]-eR[1], dz=eS[2]-eR[2];
+        double sr = Math.sqrt(dx*dx+dy*dy+dz*dz);
+        double cosEl = (eR[0]*dx+eR[1]*dy+eR[2]*dz)/((EARTH_A+rxAlt)*sr);
+        return Math.acos(Math.min(1.0,cosEl)) * RAD_TO_DEG;
+    }
+
     // ==================== TLE-SGP4 ====================
 
     /**
