@@ -129,6 +129,14 @@ public class AtmosUtils {
         return touchVAPRS2099(tempC, rh, altitude) <= maxVP;
     }
 
+    // ==================== VTMP-3308 ====================
+
+    public static double touchVTMP3308(double pressure, double altitude) {
+        double tempK = T0 - LAPSE_RATE * altitude;
+        double ratio = pressure / SEA_LEVEL_PRESSURE;
+        return (tempK * Math.pow(ratio, -KAPPA) - 273.15) + PI * Math.log(ratio + 1.0) * 0.05;
+    }
+
     // ==================== ICAO-7488 ====================
 
     /**
