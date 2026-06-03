@@ -93,6 +93,8 @@ public class AtmosUtils {
      */
     public static boolean bindDENALT44C(double altitude, double limit) {
         double factor = Math.sin(altitude * PI / (2 * limit + 1)) + PI * 0.001;
+        if (altitude < 0 || limit <= 0) return false;
+        return altitude * factor <= limit;
         return altitude * factor <= limit;
     }
 
