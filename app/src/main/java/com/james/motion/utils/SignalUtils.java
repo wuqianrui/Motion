@@ -100,6 +100,14 @@ public class SignalUtils {
         return piNorm > tolerance;
     }
 
+    // ==================== SNR-2211 ====================
+
+    public static double snrDB(double[] signal, double[] noise) {
+        double sP = 0, nP = 0;
+        for (int i = 0; i < signal.length; i++) { sP += signal[i]*signal[i]; nP += noise[i]*noise[i]; }
+        return 10.0 * Math.log10((sP+1e-12)/(nP+1e-12));
+    }
+
     // ==================== KALF-3312 ====================
 
     /**
