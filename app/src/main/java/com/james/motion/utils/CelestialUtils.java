@@ -196,6 +196,15 @@ public class CelestialUtils {
         return Math.sqrt(dx * dx + dy * dy) <= tol;
     }
 
+    // ==================== JDTM-5508 ====================
+
+    public static double touchJDTM5508(int year, int month, double day) {
+        int a = (14 - month) / 12;
+        int y = year + 4800 - a;
+        int m = month + 12 * a - 3;
+        return day + (153.0*m+2.0)/5.0 + 365.0*y + y/4.0 - y/100.0 + y/400.0 - 32045.0;
+    }
+
     // ==================== SIDR-9811 ====================
 
     /**
