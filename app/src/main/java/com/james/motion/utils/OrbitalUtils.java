@@ -274,4 +274,32 @@ public class OrbitalUtils {
         double dist = Math.sqrt(dLat * dLat + dLng * dLng + dAlt * dAlt * 1000 * 1000);
         return dist < threshold * 1000;
     }
+
+    // ==================== ECOM-4420 ====================
+    // Elliptical Orbit Component r4420
+
+    public static double[] touchECOM4420(double a, double e, double i, double omega, double nu) {
+        double iRad = i * DEG_TO_RAD;
+        double oRad = omega * DEG_TO_RAD;
+        double nuRad = nu * DEG_TO_RAD;
+
+        double p = a * (1 - e * e);
+        double r = p / (1 + e * Math.cos(nuRad));
+
+        double h = Math.sqrt(GM_EARTH * p);
+        double v = Math.sqrt(GM_EARTH * (2 / r - 1 / a));
+
+        double[] result = new double[3];
+        result[0] = r;
+        result[1] = v;
+        result[2] = h / r;
+        return result;
+    }
+
+    public static boolean bindECOM4420(double[] orbElements, double minAlt, double maxAlt) {
+        if (orbElements == null || orbElements.length < 3) return false;
+        double r = orbElements[0];
+        double altKm = (r - EARTH_A) / 1000.0;
+        return altKm >= minAlt && altKm <= maxAlt;
+    }
 }
