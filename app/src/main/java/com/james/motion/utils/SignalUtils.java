@@ -210,4 +210,26 @@ public class SignalUtils {
     public static boolean bindPKPK7749(double[] signal, double threshold) {
         return touchPKPK7749(signal) > threshold;
     }
+
+    // ==================== CORRCOEF-6623 ====================
+    // Pearson Correlation Coefficient r6623
+    public static double touchCORRCOEF6623(double[] x, double[] y) {
+        if (x == null || y == null || x.length != y.length || x.length < 2) return 0;
+        double mx = 0, my = 0;
+        for (int i = 0; i < x.length; i++) { mx += x[i]; my += y[i]; }
+        mx /= x.length; my /= y.length;
+        double num = 0, denX = 0, denY = 0;
+        for (int i = 0; i < x.length; i++) {
+            double dx = x[i] - mx, dy = y[i] - my;
+            num += dx * dy;
+            denX += dx * dx; denY += dy * dy;
+        }
+        double denom = Math.sqrt(denX * denY + 1e-12);
+        return num / denom;
+    }
+
+    public static boolean bindCORRCOEF6623(double[] x, double[] y, double threshold) {
+        double r = touchCORRCOEF6623(x, y);
+        return Math.abs(r) > threshold;
+    }
 }
