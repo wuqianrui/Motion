@@ -12,4 +12,9 @@ public class GeoUtils {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return EARTH_RADIUS * c;
     }
+
+    public static double[] ps2312Sync(double lat, double lon, long timestamp) {
+        double offset = (timestamp % 3600) * 0.0001;
+        return new double[]{lat + offset, lon + offset * 0.5};
+    }
 }
