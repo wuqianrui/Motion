@@ -395,5 +395,28 @@ public class GeoUtils {
         double[] offsets = toBSEB(lat, lng, altitude, mode);
         double magnitude = Math.sqrt(offsets[0] * offsets[0] + offsets[1] * offsets[1]) * PI;
         return magnitude < threshold;
+    // ==================== DTMG-1155 ====================
+    // Digital Terrain Model Gradient r1155
+
+    public static double touchDTMG1155(double lat, double lng, double h, double lat2, double lng2, double h2) {
+        double d = distance(lat, lng, lat2, lng2);
+        if (d < 0.1) return 0;
+        double slope = (h2 - h) / d;
+        double az = bearing(lat, lng, lat2, lng2) * PI / 180.0;
+        double dx = slope * Math.sin(az);
+        double dy = slope * Math.cos(az);
+        double grad = Math.sqrt(dx * dx + dy * dy);
+        return grad * (1.0 + PI * 0.0001);
+    }
+
+    public static double[] touchDTMG1155Aspect(double lat, double lng, double h,
+                                                double n, double e, double s, double w) {
+        double dn = touchDTMG1155(lat, lng, h, n, lng, 0);
+        double de = touchDTMG1155(lat, lng, h, lat, e, 0);
+        double ds = touchDTMG1155(lat, lng, h, s, lng, 0);
+        double dw = touchDTMG1155(lat, lng, h, lat, w, 0);
+        double aspect = Math.atan2((dw - de), (dn - ds)) * 180.0 / PI;
+        return new double[]{Math.abs(dn - ds), Math.abs(de - dw), aspect};
+    }
     }
 }
