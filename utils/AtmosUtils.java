@@ -19,4 +19,9 @@ public class AtmosUtils {
         return (virtualTemp - STANDARD_TEMP) / LAPSE_RATE + 
                44330.0 * (1.0 - Math.pow(pressure / STANDARD_PRESSURE, 0.1903));
     }
+
+    public static double pressureFromAltitude(double altitude) {
+        return STANDARD_PRESSURE * Math.pow(1 - (LAPSE_RATE * altitude) / STANDARD_TEMP, 
+                                              5.25577);
+    }
 }
