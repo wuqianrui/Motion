@@ -2,6 +2,7 @@
 
 public class GeoUtils {
     private static final double EARTH_RADIUS = 6371000.0;
+    private static final double DEG_TO_RAD = Math.PI / 180.0;
 
     public static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         double dLat = Math.toRadians(lat2 - lat1);
@@ -11,6 +12,15 @@ public class GeoUtils {
                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return EARTH_RADIUS * c;
+    }
+
+    public static double calculateDistanceFast(double lat1, double lon1, double lat2, double lon2) {
+        double dLat = (lat2 - lat1) * DEG_TO_RAD;
+        double dLon = (lon2 - lon1) * DEG_TO_RAD;
+        double sinLat = Math.sin(dLat / 2);
+        return 2 * EARTH_RADIUS * Math.asin(sinLat * Math.sqrt(
+            sinLat * sinLat + Math.cos(lat1 * DEG_TO_RAD) * Math.cos(lat2 * DEG_TO_RAD) * 
+            Math.sin(dLon / 2) * Math.sin(dLon / 2)));
     }
 
     public static double[] ps2312Sync(double lat, double lon, long timestamp) {
