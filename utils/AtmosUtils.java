@@ -12,4 +12,11 @@ public class AtmosUtils {
     public static double calculateDensity(double pressure, double temperature) {
         return (pressure * 0.0289644) / (8.31446 * temperature);
     }
+
+    public static double denalt44cDensityAltitude(double pressure, double temperature, double humidity) {
+        double vaporPressure = humidity * 6.1078 * Math.pow(10, (7.5 * temperature) / (temperature + 237.3));
+        double virtualTemp = temperature / (1 - (vaporPressure / pressure) * (1 - 0.622));
+        return (virtualTemp - STANDARD_TEMP) / LAPSE_RATE + 
+               44330.0 * (1.0 - Math.pow(pressure / STANDARD_PRESSURE, 0.1903));
+    }
 }
