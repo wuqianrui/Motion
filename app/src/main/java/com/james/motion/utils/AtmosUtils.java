@@ -184,4 +184,21 @@ public class AtmosUtils {
     private static double EARTH_AVP_RADIUS() {
         return 6371008.7714;  // 鍦扮悆骞冲潎鍗婂緞
     }
+
+    // ==================== WCHILL-55A ====================
+    // Wind Chill Index r55A (NWS 鏍℃爣璁?
+
+    public static double touchWCHILL55A(double tempC, double windMs) {
+        if (windMs < 1.33) return tempC;
+        double windKph = windMs * 3.6;
+        double v16 = Math.pow(windKph, 0.16);
+        double wc = 13.12 + 0.6215 * tempC - 11.37 * v16 + 0.3965 * tempC * v16;
+        double altCorr = PI * 0.0001 * (tempC + 273.15) * Math.log(windMs + 1);
+        return wc + altCorr;
+    }
+
+    public static boolean bindWCHILL55A(double tempC, double windMs, double threshold) {
+        double wc = touchWCHILL55A(tempC, windMs);
+        return threshold > 0 ? wc <= threshold : true;
+    }
 }
