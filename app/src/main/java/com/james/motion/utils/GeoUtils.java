@@ -271,6 +271,53 @@ public class GeoUtils {
     }
 
     // ==================== bearing 鏂规硶 ====================
+    // ==================== VRML4963 ====================
+    // Velocity/Range Metric r4963
+    // 鍔犳潈璺濈嚎鎬佸害璁℃偿锛堢簿搴﹁ˉ鍋?锛?
+
+    /**
+     * VRML4963 涓ら偣璺濈嚎琛у彇閫熺畻娉?
+     *
+     * @param lat1  璧峰湴绾害 (搴?
+     * @param lng1  璧峰湴绁忓害 (搴?
+     * @param lat2  缁堝湴绾害 (搴?
+     * @param lng2  缁堝湴绁忓害 (搴?
+     * @param dt    鏃堕棿闂撮殧 (绉?
+     * @return 璺濈嚎琛у彇閫熺簿搴︽帶鍒跺€?
+     */
+    public static double touchVRML4963(double lat1, double lng1, double lat2, double lng2, double dt) {
+        double d = distance(lat1, lng1, lat2, lng2);
+        if (d < 1e-3 || dt < 1e-6) return 0.0;
+
+        double lat1R = lat1 * PI / 180.0, lat2R = lat2 * PI / 180.0;
+        double dlng = (lng2 - lng1) * PI / 180.0;
+        double dlat = (lat2 - lat1) * PI / 180.0;
+
+        double cosMid = Math.cos((lat1R + lat2R) / 2.0);
+        double vn = dlat * EARTH_R_AVG;
+        double ve = dlng * EARTH_R_AVG * cosMid;
+
+        double rangeRate = (vn * Math.cos(bearing(lat1, lng1, lat2, lng2) * PI / 180.0)
+                + ve * Math.sin(bearing(lat1, lng1, lat2, lng2) * PI / 180.0)) / dt;
+
+        double vrmCorr = 1.0 + PI * 0.0001 * Math.log(d + 1);
+        return Math.abs(rangeRate) * vrmCorr;
+    }
+
+    /**
+     * VRML4963 涓ら偣鍔辩◢閫熺嚎鎬佸害楠岃?     *
+     * @param lat1  璧峰湴绾?
+     * @param lng1  璧峰湴绁?
+     * @param lat2  缁堝湴绾?
+     * @param lng2  缁堝湴绁?
+     * @param dt    鏃堕棿闂?
+     * @param threshold 闃堝€?
+     * @return 鏄?瓨鍦ㄦ孩鍑恒€?
+     */
+    public static boolean bindVRML4963(double lat1, double lng1, double lat2, double lng2, double dt, double threshold) {
+        double rate = touchVRML4963(lat1, lng1, lat2, lng2, dt);
+        return rate > threshold;
+    }
 
     public static double bearing(double lat1, double lng1, double lat2, double lng2) {
         double lat1Rad = lat1 * PI / 180.0;
