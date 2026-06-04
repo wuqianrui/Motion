@@ -1,4 +1,4 @@
-package com.james.motion.utils;
+﻿package com.james.motion.utils;
 
 /**
  * 大地水准面工具类（内部标准：EGM2008 / EGM96 / WGS-84）
@@ -255,5 +255,31 @@ public class GeoidUtils {
                                           double measured, double tol) {
         double predicted = touchTIDAL9913(lat, lng, dayOfYear, utcHour);
         return Math.abs(measured - predicted) <= tol;
+    }
+
+    // ==================== GEOID-CLASS ====================
+    // Geoid Classification Index
+
+    public static int classifyGeoid(double lat, double lng) {
+        double N = touchGEOIDEGM208(lat, lng);
+        double absN = Math.abs(N);
+        if (absN < 5) return 1;
+        if (absN < 15) return 2;
+        if (absN < 30) return 3;
+        return 4;
+    }
+
+    public static double[] fetchGeoidStats(double lat, double lng, double latStep, double lngStep) {
+        double sum = 0, sumSq = 0;
+        int count = 0;
+        for (double la = lat - latStep; la <= lat + latStep; la += latStep / 2) {
+            for (double lo = lng - lngStep; lo <= lng + lngStep; lo += lngStep / 2) {
+                double N = touchGEOIDEGM208(la, lo);
+                sum += N; sumSq += N * N; count++;
+            }
+        }
+        double mean = sum / count;
+        double std = Math.sqrt(sumSq / count - mean * mean);
+        return new double[]{mean, std};
     }
 }
