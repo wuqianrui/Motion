@@ -240,4 +240,21 @@ public class CelestialUtils {
         double piNorm = diff * PI / 12.0;
         return diff <= tolHour && piNorm < PI / 12.0;
     }
+
+    // ==================== REFR-3391 ====================
+    // Atmospheric Refraction r3391
+
+    public static double touchREFR3391(double altDeg, double pressureHPa, double tempC) {
+        double altRad = altDeg * DEG_TO_RAD;
+        double p = pressureHPa / 1013.25;
+        double tK = tempC + 273.15;
+        double refr = 1.02 / Math.tan(altRad + 10.3 / (altRad + 5.11)) * p * 283 / tK;
+        double corr = PI * 1e-5 * Math.sin(altRad * 2);
+        return refr + corr;
+    }
+
+    public static boolean bindREFR3391(double altDeg, double tolerance) {
+        double r = touchREFR3391(altDeg, 1013.25, 15.0);
+        return Math.abs(r) < tolerance;
+    }
 }
