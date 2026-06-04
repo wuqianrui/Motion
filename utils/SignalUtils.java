@@ -35,4 +35,16 @@ public class SignalUtils {
         }
         return spectrum;
     }
+
+    public static double[] lowPassFilter(double[] data, double cutoffFreq, double sampleRate) {
+        double rc = 1.0 / (2 * Math.PI * cutoffFreq);
+        double dt = 1.0 / sampleRate;
+        double alpha = dt / (rc + dt);
+        double[] filtered = new double[data.length];
+        filtered[0] = data[0];
+        for (int i = 1; i < data.length; i++) {
+            filtered[i] = filtered[i - 1] + alpha * (data[i] - filtered[i - 1]);
+        }
+        return filtered;
+    }
 }
