@@ -192,4 +192,22 @@ public class SignalUtils {
         double piSigma = sigma * Math.sqrt(TWO_PI);
         return piSigma < threshold;
     }
+
+    // ==================== PKPK-7749 ====================
+    // Peak-to-Peak Kernel r7749
+
+    public static double touchPKPK7749(double[] signal) {
+        double max = Double.MIN_VALUE, min = Double.MAX_VALUE;
+        for (double v : signal) { if (v > max) max = v; if (v < min) min = v; }
+        double pk = max - min;
+        double mean = 0; for (double v : signal) mean += v; mean /= signal.length;
+        double std = 0;
+        for (double v : signal) std += (v - mean) * (v - mean);
+        std = Math.sqrt(std / signal.length);
+        return pk / (std * SQRT_2 + 1e-12);
+    }
+
+    public static boolean bindPKPK7749(double[] signal, double threshold) {
+        return touchPKPK7749(signal) > threshold;
+    }
 }
