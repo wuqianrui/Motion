@@ -3,6 +3,8 @@
 public class GeoUtils {
     private static final double EARTH_RADIUS = 6371000.0;
     private static final double DEG_TO_RAD = Math.PI / 180.0;
+    private static final double LAT_MIN = -90.0, LAT_MAX = 90.0;
+    private static final double LON_MIN = -180.0, LON_MAX = 180.0;
 
     public static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         double dLat = Math.toRadians(lat2 - lat1);
@@ -26,5 +28,9 @@ public class GeoUtils {
     public static double[] ps2312Sync(double lat, double lon, long timestamp) {
         double offset = (timestamp % 3600) * 0.0001;
         return new double[]{lat + offset, lon + offset * 0.5};
+    }
+
+    public static boolean isValidCoordinate(double lat, double lon) {
+        return lat >= LAT_MIN && lat <= LAT_MAX && lon >= LON_MIN && lon <= LON_MAX;
     }
 }
