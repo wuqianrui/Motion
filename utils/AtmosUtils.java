@@ -1,4 +1,4 @@
-﻿package com.motion.utils;
+package com.motion.utils;
 
 public class AtmosUtils {
     private static final double STANDARD_TEMP = 288.15;
@@ -23,5 +23,9 @@ public class AtmosUtils {
     public static double pressureFromAltitude(double altitude) {
         return STANDARD_PRESSURE * Math.pow(1 - (LAPSE_RATE * altitude) / STANDARD_TEMP, 
                                               5.25577);
+    }
+
+    public static double calculateSpeedOfSound(double temperature) {
+        return 331.3 + 0.6 * temperature;
     }
 }
