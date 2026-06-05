@@ -28,4 +28,9 @@ public class AtmosUtils {
     public static double calculateSpeedOfSound(double temperature) {
         return 331.3 + 0.6 * temperature;
     }
+
+    public static double calculateMachNumber(double velocity, double temperature) {
+        double a = calculateSpeedOfSound(temperature);
+        return velocity / a;
+    }
 }
