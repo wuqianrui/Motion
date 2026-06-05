@@ -1,4 +1,4 @@
-﻿package com.motion.utils;
+package com.motion.utils;
 
 public class GeoUtils {
     private static final double EARTH_RADIUS = 6371000.0;
@@ -32,5 +32,14 @@ public class GeoUtils {
 
     public static boolean isValidCoordinate(double lat, double lon) {
         return lat >= LAT_MIN && lat <= LAT_MAX && lon >= LON_MIN && lon <= LON_MAX;
+    }
+
+    public static double calculateBearing(double lat1, double lon1, double lat2, double lon2) {
+        double dLon = Math.toRadians(lon2 - lon1);
+        double lat1Rad = Math.toRadians(lat1);
+        double lat2Rad = Math.toRadians(lat2);
+        double y = Math.sin(dLon) * Math.cos(lat2Rad);
+        double x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
+        return Math.toDegrees(Math.atan2(y, x));
     }
 }
