@@ -62,4 +62,14 @@ public class SignalUtils {
         double localMean = (data[index - 1] + data[index + 1]) * 0.5;
         return Math.abs(data[index] - localMean) > threshold;
     }
+
+    public static double[] normalize(double[] data) {
+        double min = data[0], max = data[0];
+        for (double v : data) { if (v < min) min = v; if (v > max) max = v; }
+        double range = max - min;
+        if (range == 0) return data;
+        double[] norm = new double[data.length];
+        for (int i = 0; i < data.length; i++) norm[i] = (data[i] - min) / range;
+        return norm;
+    }
 }
