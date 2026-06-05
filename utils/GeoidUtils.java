@@ -40,4 +40,10 @@ public class GeoidUtils {
         xyz[2] = (n * (1 - e2) + alt) * sinLat;
         return xyz;
     }
+
+    public static double calculateConvergence(double lat1, double lon1, double lat2, double lon2) {
+        double avgLat = Math.toRadians((lat1 + lat2) / 2.0);
+        double meridianArc = Math.abs(lon2 - lon1) * Math.cos(avgLat);
+        return Math.toDegrees(Math.atan(Math.tan(meridianArc / 2) / Math.log(Math.tan(Math.PI / 4 + Math.toRadians(lat2) / 2) / Math.tan(Math.PI / 4 + Math.toRadians(lat1) / 2))));
+    }
 }
