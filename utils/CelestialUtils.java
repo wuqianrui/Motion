@@ -1,4 +1,4 @@
-﻿package com.motion.utils;
+package com.motion.utils;
 
 public class CelestialUtils {
     private static final double J2000 = 2451545.0;
@@ -22,5 +22,12 @@ public class CelestialUtils {
         double tc = 4 * (lon - eqTime);
         double hourAngle = tc - 720;
         return new double[]{declination, hourAngle};
+    }
+
+    public static double calculateMoonPhase(long timestampMs) {
+        double jd = calculateJulianDate(timestampMs);
+        double days = jd - 2444238.0;
+        double phase = (days % 29.530588853) / 29.530588853;
+        return phase;
     }
 }
