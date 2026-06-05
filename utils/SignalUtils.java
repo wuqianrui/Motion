@@ -56,4 +56,10 @@ public class SignalUtils {
         }
         return result;
     }
+
+    public static boolean detectSpike(double[] data, int index, double threshold) {
+        if (index < 1 || index >= data.length - 1) return false;
+        double localMean = (data[index - 1] + data[index + 1]) * 0.5;
+        return Math.abs(data[index] - localMean) > threshold;
+    }
 }
