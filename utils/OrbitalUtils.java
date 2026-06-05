@@ -31,4 +31,8 @@ public class OrbitalUtils {
     public static double calculatePerigee(double a, double e) {
         return a * (1.0 - e);
     }
+
+    public static double calculateApogee(double a, double e) {
+        return a * (1.0 + e);
+    }
 }
