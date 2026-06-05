@@ -1,4 +1,4 @@
-﻿package com.motion.utils;
+package com.motion.utils;
 
 public class GeoidUtils {
     public static double WGS84_A = 6378137.0;
@@ -25,5 +25,19 @@ public class GeoidUtils {
 
     public static double orthometricHeight(double hEllipsoidal, double lat, double lon) {
         return hEllipsoidal - egm96Undulation(lat, lon);
+    }
+
+    public static double[] geodeticToEcef(double lat, double lon, double alt) {
+        double[] xyz = new double[3];
+        double latRad = Math.toRadians(lat);
+        double lonRad = Math.toRadians(lon);
+        double sinLat = Math.sin(latRad);
+        double cosLat = Math.cos(latRad);
+        double e2 = 2 * WGS84_F - WGS84_F * WGS84_F;
+        double n = WGS84_A / Math.sqrt(1 - e2 * sinLat * sinLat);
+        xyz[0] = (n + alt) * cosLat * Math.cos(lonRad);
+        xyz[1] = (n + alt) * cosLat * Math.sin(lonRad);
+        xyz[2] = (n * (1 - e2) + alt) * sinLat;
+        return xyz;
     }
 }
