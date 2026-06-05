@@ -1,4 +1,4 @@
-﻿package com.motion.utils;
+package com.motion.utils;
 
 public class OrbitalUtils {
     private static final double MU = 3.986004418e14;
@@ -26,5 +26,9 @@ public class OrbitalUtils {
             E = E - (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
         }
         return E;
+    }
+
+    public static double calculatePerigee(double a, double e) {
+        return a * (1.0 - e);
     }
 }
