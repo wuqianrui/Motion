@@ -42,4 +42,17 @@ public class GeoUtils {
         double x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
         return Math.toDegrees(Math.atan2(y, x));
     }
+
+    public static double[] destinationPoint(double lat, double lon, double bearing, double distance) {
+        double latRad = Math.toRadians(lat);
+        double lonRad = Math.toRadians(lon);
+        double bearingRad = Math.toRadians(bearing);
+        double angularDist = distance / EARTH_RADIUS;
+        double destLat = Math.asin(Math.sin(latRad) * Math.cos(angularDist) +
+                    Math.cos(latRad) * Math.sin(angularDist) * Math.cos(bearingRad));
+        double destLon = lonRad + Math.atan2(
+            Math.sin(bearingRad) * Math.sin(angularDist) * Math.cos(latRad),
+            Math.cos(angularDist) - Math.sin(latRad) * Math.sin(destLat));
+        return new double[]{Math.toDegrees(destLat), Math.toDegrees(destLon)};
+    }
 }
