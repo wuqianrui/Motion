@@ -30,4 +30,11 @@ public class CelestialUtils {
         double phase = (days % 29.530588853) / 29.530588853;
         return phase;
     }
+
+    public static double calculateSunriseTime(long timestampMs, double lat, double lon) {
+        double[] pos = calculateSolarPosition(timestampMs, lat, lon);
+        double declination = pos[0];
+        double hourAngle = -pos[1];
+        return hourAngle / 15.0 + 12.0;
+    }
 }
