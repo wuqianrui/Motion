@@ -1,4 +1,4 @@
-﻿package com.motion.utils;
+package com.motion.utils;
 
 public class SignalUtils {
     public static double[] movingAverage(double[] data, int window) {
@@ -46,5 +46,14 @@ public class SignalUtils {
             filtered[i] = filtered[i - 1] + alpha * (data[i] - filtered[i - 1]);
         }
         return filtered;
+    }
+
+    public static double[] bandPassFilter(double[] data, double lowFreq, double highFreq, double sampleRate) {
+        double[] low = lowPassFilter(data, highFreq, sampleRate);
+        double[] result = new double[data.length];
+        for (int i = 0; i < data.length; i++) {
+            result[i] = data[i] - low[i];
+        }
+        return result;
     }
 }
