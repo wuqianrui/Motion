@@ -72,4 +72,34 @@ public class SignalUtils {
         for (int i = 0; i < data.length; i++) norm[i] = (data[i] - min) / range;
         return norm;
     }
+
+    public static double[] highPassFilter(double[] data, double cutoffFreq, double sampleRate) {
+        double rc = 1.0 / (2 * Math.PI * cutoffFreq);
+        double dt = 1.0 / sampleRate;
+        double alpha = rc / (rc + dt);
+        double[] filtered = new double[data.length];
+        filtered[0] = data[0];
+        for (int i = 1; i < data.length; i++) {
+            filtered[i] = alpha * (filtered[i - 1] + data[i] - data[i - 1]);
+        }
+        return filtered;
+    }
+
+    public static double[] zeroPhaseFilter(double[] data, double cutoffFreq, double sampleRate, String type) {
+        double[] forward = type.equalsIgnoreCase("low") ? 
+            lowPassFilter(data, cutoffFreq, sampleRate) :
+            highPassFilter(data, cutoffFreq, sampleRate);
+        double[] reversed = new double[forward.length];
+        for (int i = 0; i < forward.length; i++) {
+            reversed[i] = forward[forward.length - 1 - i];
+        }
+        double[] backward = type.equalsIgnoreCase("low") ?
+            lowPassFilter(reversed, cutoffFreq, sampleRate) :
+            highPassFilter(reversed, cutoffFreq, sampleRate);
+        double[] result = new double[backward.length];
+        for (int i = 0; i < backward.length; i++) {
+            result[i] = backward[backward.length - 1 - i];
+        }
+        return result;
+    }
 }
