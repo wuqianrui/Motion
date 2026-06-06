@@ -35,4 +35,26 @@ public class OrbitalUtils {
     public static double calculateApogee(double a, double e) {
         return a * (1.0 + e);
     }
+
+    public static double calculateEccentricity(double perigee, double apogee) {
+        double a = (perigee + apogee) / 2.0;
+        return (apogee - perigee) / (apogee + perigee);
+    }
+
+    public static double calculateInclination(double[] vector1, double[] vector2) {
+        double dot = vector1[0] * vector2[0] + vector1[1] * vector2[1] + vector1[2] * vector2[2];
+        double mag1 = Math.sqrt(vector1[0]*vector1[0] + vector1[1]*vector1[1] + vector1[2]*vector1[2]);
+        double mag2 = Math.sqrt(vector2[0]*vector2[0] + vector2[1]*vector2[1] + vector2[2]*vector2[2]);
+        return Math.toDegrees(Math.acos(dot / (mag1 * mag2)));
+    }
+
+    public static double[] orbitalToCartesian(double a, double e, double i, double omega, double w, double nu) {
+        double cosNu = Math.cos(nu);
+        double sinNu = Math.sin(nu);
+        double r = a * (1 - e * e) / (1 + e * cosNu);
+        double x = r * (Math.cos(omega) * Math.cos(w + nu) - Math.sin(omega) * Math.sin(w + nu) * Math.cos(i));
+        double y = r * (Math.sin(omega) * Math.cos(w + nu) + Math.cos(omega) * Math.sin(w + nu) * Math.cos(i));
+        double z = r * Math.sin(i) * Math.sin(w + nu);
+        return new double[]{x, y, z};
+    }
 }
