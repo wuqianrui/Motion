@@ -37,4 +37,31 @@ public class CelestialUtils {
         double hourAngle = -pos[1];
         return hourAngle / 15.0 + 12.0;
     }
+
+    public static double[] calculateMoonPosition(long timestampMs, double lat, double lon) {
+        double jd = calculateJulianDate(timestampMs);
+        double d = jd - 2451545.0;
+        double n = 125.1228 - 0.0529538083 * d;
+        double i = 5.1454;
+        double w = 318.0634 + 0.1643573223 * d;
+        double a = 60.2666;
+        double e = 0.054900;
+        double m = 115.3654 + 13.0649929509 * d;
+        double apparentLon = n + w + m;
+        double parallax = Math.toDegrees(Math.asin(6378.14 / a));
+        return new double[]{apparentLon % 360, parallax};
+    }
+
+    public static double calculateSolarElevation(double lat, double lon, long timestampMs) {
+        double[] pos = calculateSolarPosition(timestampMs, lat, lon);
+        double declination = pos[0];
+        double hourAngle = pos[1];
+        double latRad = Math.toRadians(lat);
+        double decRad = Math.toRadians(declination);
+        double elevation = Math.toDegrees(Math.asin(
+            Math.sin(latRad) * Math.sin(decRad) + 
+            Math.cos(latRad) * Math.cos(decRad) * Math.cos(Math.toRadians(hourAngle))
+        ));
+        return elevation;
+    }
 }
