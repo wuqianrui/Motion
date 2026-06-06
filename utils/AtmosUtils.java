@@ -10,7 +10,16 @@ public class AtmosUtils {
     }
 
     public static double calculateDensity(double pressure, double temperature) {
-        return (pressure * 0.0289644) / (8.31446 * temperature);
+        final double R_SPECIFIC = 287.058;
+        return pressure / (R_SPECIFIC * temperature);
+    }
+
+    public static double calculateDynamicViscosity(double temperature) {
+        double tempK = temperature + 273.15;
+        double mu0 = 1.716e-5;
+        double T0 = 273.15;
+        double C = 111.0;
+        return mu0 * Math.pow(tempK / T0, 1.5) * (T0 + C) / (tempK + C);
     }
 
     public static double denalt44cDensityAltitude(double pressure, double temperature, double humidity) {
