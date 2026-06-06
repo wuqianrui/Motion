@@ -46,4 +46,19 @@ public class GeoidUtils {
         double meridianArc = Math.abs(lon2 - lon1) * Math.cos(avgLat);
         return Math.toDegrees(Math.atan(Math.tan(meridianArc / 2) / Math.log(Math.tan(Math.PI / 4 + Math.toRadians(lat2) / 2) / Math.tan(Math.PI / 4 + Math.toRadians(lat1) / 2))));
     }
+
+    public static double calculateGeoidHeight(double lat, double lon) {
+        double[] coeffs = {0.5, -0.3, 0.2, 0.1, -0.15};
+        double result = 0.0;
+        for (int i = 0; i < coeffs.length; i++) {
+            result += coeffs[i] * Math.sin(Math.toRadians(lat) * (i + 1)) * Math.cos(Math.toRadians(lon) * (i + 1));
+        }
+        return result;
+    }
+
+    public static double[] calculateDeflectionOfVertical(double lat, double lon) {
+        double xi = 0.1 * Math.sin(Math.toRadians(lat) * 2) * Math.cos(Math.toRadians(lon));
+        double eta = 0.08 * Math.cos(Math.toRadians(lat)) * Math.sin(Math.toRadians(lon) * 2);
+        return new double[]{xi, eta};
+    }
 }
