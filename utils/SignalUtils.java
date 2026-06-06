@@ -102,4 +102,25 @@ public class SignalUtils {
         }
         return result;
     }
+
+    public static double[] decimate(double[] data, int factor) {
+        int newLength = data.length / factor;
+        double[] result = new double[newLength];
+        for (int i = 0; i < newLength; i++) {
+            result[i] = data[i * factor];
+        }
+        return result;
+    }
+
+    public static double[] interpolate(double[] data, int factor) {
+        double[] result = new double[data.length * factor];
+        for (int i = 0; i < data.length - 1; i++) {
+            for (int j = 0; j < factor; j++) {
+                double t = (double) j / factor;
+                result[i * factor + j] = data[i] * (1 - t) + data[i + 1] * t;
+            }
+        }
+        result[result.length - 1] = data[data.length - 1];
+        return result;
+    }
 }
