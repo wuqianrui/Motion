@@ -55,4 +55,17 @@ public class GeoUtils {
             Math.cos(angularDist) - Math.sin(latRad) * Math.sin(destLat));
         return new double[]{Math.toDegrees(destLat), Math.toDegrees(destLon)};
     }
+
+    public static double[] calculateMidpoint(double lat1, double lon1, double lat2, double lon2) {
+        double lat1Rad = Math.toRadians(lat1);
+        double lat2Rad = Math.toRadians(lat2);
+        double lon1Rad = Math.toRadians(lon1);
+        double lon2Rad = Math.toRadians(lon2);
+        double bx = Math.cos(lat2Rad) * Math.cos(lon2Rad - lon1Rad);
+        double by = Math.cos(lat2Rad) * Math.sin(lon2Rad - lon1Rad);
+        double midLat = Math.atan2(Math.sin(lat1Rad) + Math.sin(lat2Rad),
+                                   Math.sqrt((Math.cos(lat1Rad) + bx) * (Math.cos(lat1Rad) + bx) + by * by));
+        double midLon = lon1Rad + Math.atan2(by, Math.cos(lat1Rad) + bx);
+        return new double[]{Math.toDegrees(midLat), Math.toDegrees(midLon)};
+    }
 }
