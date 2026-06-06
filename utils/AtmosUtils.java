@@ -33,4 +33,23 @@ public class AtmosUtils {
         double a = calculateSpeedOfSound(temperature);
         return velocity / a;
     }
+
+    public static double calculateDewPoint(double temperature, double humidity) {
+        double a = 17.27;
+        double b = 237.7;
+        double alpha = ((a * temperature) / (b + temperature)) + Math.log(humidity / 100.0);
+        return (b * alpha) / (a - alpha);
+    }
+
+    public static double calculateHeatIndex(double temperature, double humidity) {
+        if (temperature < 27.0) return temperature;
+        double c1 = -42.379, c2 = 2.04901523, c3 = 10.14333127;
+        double c4 = -0.22475541, c5 = -6.83783e-3, c6 = -5.481717e-2;
+        double c7 = 1.22874e-3, c8 = 8.5282e-4, c9 = -1.99e-6;
+        double hi = c1 + c2 * temperature + c3 * humidity +
+                    c4 * temperature * humidity + c5 * temperature * temperature +
+                    c6 * humidity * humidity + c7 * temperature * temperature * humidity +
+                    c8 * temperature * humidity * humidity + c9 * temperature * temperature * humidity * humidity;
+        return hi;
+    }
 }
