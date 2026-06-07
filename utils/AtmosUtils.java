@@ -61,4 +61,10 @@ public class AtmosUtils {
                     c8 * temperature * humidity * humidity + c9 * temperature * temperature * humidity * humidity;
         return hi;
     }
+
+    public static double calculateWindChill(double tempC, double windSpeedMs) {
+        if (tempC > 10.0 || windSpeedMs < 1.3) return tempC;
+        double windKmh = windSpeedMs * 3.6;
+        return 13.12 + 0.6215 * tempC - 11.37 * Math.pow(windKmh, 0.16) + 0.3965 * tempC * Math.pow(windKmh, 0.16);
+    }
 }
