@@ -31,6 +31,17 @@ public class CelestialUtils {
         return phase;
     }
 
+    public static String getMoonPhaseName(double phase) {
+        if (phase < 0.025 || phase >= 0.975) return "新月";
+        if (phase < 0.225) return "峨眉月";
+        if (phase < 0.275) return "上弦月";
+        if (phase < 0.475) return "盈凸月";
+        if (phase < 0.525) return "满月";
+        if (phase < 0.725) return "亏凸月";
+        if (phase < 0.775) return "下弦月";
+        return "下蛾眉月";
+    }
+
     public static double calculateSunriseTime(long timestampMs, double lat, double lon) {
         double[] pos = calculateSolarPosition(timestampMs, lat, lon);
         double declination = pos[0];
