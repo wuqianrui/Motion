@@ -72,4 +72,13 @@ public class GeoUtils {
         double midLon = lon1Rad + Math.atan2(by, Math.cos(lat1Rad) + bx);
         return new double[]{Math.toDegrees(midLat), Math.toDegrees(midLon)};
     }
+
+    public static double calculateTriangleArea(double lat1, double lon1, double lat2, double lon2, double lat3, double lon3) {
+        double b1 = calculateBearing(lat1, lon1, lat2, lon2);
+        double d12 = calculateDistance(lat1, lon1, lat2, lon2);
+        double b2 = calculateBearing(lat1, lon1, lat3, lon3);
+        double d13 = calculateDistance(lat1, lon1, lat3, lon3);
+        double angle = Math.toRadians(Math.abs(b2 - b1));
+        return 0.5 * d12 * d13 * Math.sin(angle);
+    }
 }
