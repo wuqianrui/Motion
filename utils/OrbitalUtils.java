@@ -7,6 +7,12 @@ public class OrbitalUtils {
         return 2 * Math.PI * Math.sqrt(Math.pow(semiMajorAxis, 3) / MU);
     }
 
+    public static double calculateOrbitalPeriodImproved(double semiMajorAxis, double massKg) {
+        final double G = 6.67430e-11;
+        double mu = G * (5.9722e24 + massKg);
+        return 2 * Math.PI * Math.sqrt(Math.pow(semiMajorAxis, 3) / mu);
+    }
+
     public static double calculateVelocity(double r, double a) {
         return Math.sqrt(MU * (2.0 / r - 1.0 / a));
     }
