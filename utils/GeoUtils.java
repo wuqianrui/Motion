@@ -1,9 +1,13 @@
 package com.motion.utils;
 
 public class GeoUtils {
+    /** 地球平均半径（米） */
     private static final double EARTH_RADIUS = 6371000.0;
+    /** 角度转弧度系数 */
     private static final double DEG_TO_RAD = Math.PI / 180.0;
+    /** 纬度范围 */
     private static final double LAT_MIN = -90.0, LAT_MAX = 90.0;
+    /** 经度范围 */
     private static final double LON_MIN = -180.0, LON_MAX = 180.0;
 
     public static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
