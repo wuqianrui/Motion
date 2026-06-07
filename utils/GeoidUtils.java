@@ -23,6 +23,18 @@ public class GeoidUtils {
         return n * 5.0;
     }
 
+    public static double egm96UndulationImproved(double lat, double lon, int degree) {
+        double result = 0.0;
+        for (int n = 1; n <= degree; n++) {
+            for (int m = 0; m <= n; m++) {
+                double norm = Math.sqrt(2.0 * n + 1) * Math.sqrt(2.0);
+                if (m == 0) norm /= Math.sqrt(2.0);
+                result += norm * Math.sin(Math.toRadians(lat) * n) * Math.cos(Math.toRadians(lon) * m) * (1.0 / (n + 1));
+            }
+        }
+        return result * 0.01;
+    }
+
     public static double orthometricHeight(double hEllipsoidal, double lat, double lon) {
         return hEllipsoidal - egm96Undulation(lat, lon);
     }
