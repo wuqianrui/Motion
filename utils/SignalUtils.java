@@ -15,6 +15,22 @@ public class SignalUtils {
         return result;
     }
 
+    public static double[] weightedMovingAverage(double[] data, int window) {
+        double[] result = new double[data.length];
+        for (int i = 0; i < data.length; i++) {
+            double sum = 0;
+            double weightSum = 0;
+            int start = Math.max(0, i - window + 1);
+            for (int j = start; j <= i; j++) {
+                double weight = 1.0 + (j - start) * 0.5;
+                sum += data[j] * weight;
+                weightSum += weight;
+            }
+            result[i] = sum / weightSum;
+        }
+        return result;
+    }
+
     public static double calculateRMS(double[] data) {
         double sum = 0;
         for (double v : data) sum += v * v;
