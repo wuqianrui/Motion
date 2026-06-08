@@ -139,4 +139,45 @@ public class SignalUtils {
         result[result.length - 1] = data[data.length - 1];
         return result;
     }
+
+    public static double[] powerSpectralDensity(double[] data, double sampleRate) {
+        int n = data.length;
+        double[] psd = new double[n / 2];
+        double[] window = applyHammingWindow(data);
+        for (int i = 0; i < psd.length; i++) {
+            double real = 0, imag = 0;
+            for (int j = 0; j < n; j++) {
+                double angle = 2 * Math.PI * i * j / n;
+                real += window[j] * Math.cos(angle);
+                imag -= window[j] * Math.sin(angle);
+            }
+            psd[i] = (real * real + imag * imag) / (n * sampleRate);
+        }
+        return psd;
+    }
+
+    private static double[] applyHammingWindow(double[] data) {
+        double[] windowed = new double[data.length];
+        for (int i = 0; i < data.length; i++) {
+            double w = 0.54 - 0.46 * Math.cos(2 * Math.PI * i / (data.length - 1));
+            windowed[i] = data[i] * w;
+        }
+        return windowed;
+    }
+
+    public static double[] crossCorrelation(double[] x, double[] y) {
+        int n = Math.min(x.length, y.length);
+        double[] correlation = new double[2 * n - 1];
+        for (int lag = -(n - 1); lag <= n - 1; lag++) {
+            double sum = 0;
+            for (int i = 0; i < n; i++) {
+                int j = i + lag;
+                if (j >= 0 && j < n) {
+                    sum += x[i] * y[j];
+                }
+            }
+            correlation[lag + n - 1] = sum / n;
+        }
+        return correlation;
+    }
 }
