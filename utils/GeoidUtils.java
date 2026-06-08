@@ -73,4 +73,52 @@ public class GeoidUtils {
         double eta = 0.08 * Math.cos(Math.toRadians(lat)) * Math.sin(Math.toRadians(lon) * 2);
         return new double[]{xi, eta};
     }
+
+    public static double heightToOrthometric(double ellipsoidalHeight, double lat, double lon, String geoidModel) {
+        double undulation;
+        switch (geoidModel.toLowerCase()) {
+            case "egm96":
+                undulation = egm96UndulationImproved(lat, lon, 10);
+                break;
+            case "egm2008":
+                undulation = egm96Undulation(lat, lon) * 1.05;
+                break;
+            default:
+                undulation = egm96Undulation(lat, lon);
+        }
+        return ellipsoidalHeight - undulation;
+    }
+
+    public static double[] batchCalculateGeoidHeight(double[] lats, double[] lons) {
+        if (lats == null || lons == null || lats.length != lons.length) {
+            return new double[0];
+        }
+        double[] results = new double[lats.length];
+        for (int i = 0; i < lats.length; i++) {
+            results[i] = calculateGeoidHeight(lats[i], lons[i]);
+        }
+        return results;
+    }
+
+    public static double evaluateGeoidAccuracy(double lat, double lon, double actualUndulation) {
+        double calculated = egm96UndulationImproved(lat, lon, 20);
+        return Math.abs(calculated - actualUndulation);
+    }
+
+    public static double interpolateGeoidHeight(double lat, double lon, double[][] gridLats, double[][] gridLons, double[][] gridUndulations) {
+        if (gridLats == null || gridLons == null || gridUndulations == null) return 0.0;
+        int nearestI = 0, nearestJ = 0;
+        double minDist = Double.MAX_VALUE;
+        for (int i = 0; i < gridLats.length; i++) {
+            for (int j = 0; j < gridLats[i].length; j++) {
+                double dist = Math.sqrt(Math.pow(lat - gridLats[i][j], 2) + Math.pow(lon - gridLons[i][j], 2));
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearestI = i;
+                    nearestJ = j;
+                }
+            }
+        }
+        return gridUndulations[nearestI][nearestJ];
+    }
 }
