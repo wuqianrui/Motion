@@ -75,4 +75,52 @@ public class CelestialUtils {
         ));
         return elevation;
     }
+
+    public static double calculateSiderealTime(long timestampMs, double lon) {
+        double jd = calculateJulianDate(timestampMs);
+        double t = (jd - 2451545.0) / 36525.0;
+        double gmst = 280.46061837 + 360.98564736629 * (jd - 2451545.0) + 
+                      0.000387933 * t * t - t * t * t / 38710000.0;
+        gmst = gmst % 360.0;
+        if (gmst < 0) gmst += 360.0;
+        return (gmst + lon) % 360.0;
+    }
+
+    public static double[] calculatePlanetaryPosition(String planet, long timestampMs) {
+        double jd = calculateJulianDate(timestampMs);
+        double d = jd - 2451545.0;
+        double[] elements;
+        switch (planet.toLowerCase()) {
+            case "venus":
+                elements = new double[]{76.6799, 0.723336, 3.3946, 54.8910, 48.0052, 0.0};
+                break;
+            case "mars":
+                elements = new double[]{286.5182, 1.523688, 1.8497, 286.5021, 49.5574, 0.0};
+                break;
+            case "jupiter":
+                elements = new double[]{73.9520, 5.202561, 1.3033, 273.8771, 100.4277, 0.0};
+                break;
+            default:
+                return new double[]{0.0, 0.0};
+        }
+        double M = elements[0] + 0.9856473600 * d / elements[1];
+        double E = M + elements[2] * Math.toDegrees(Math.sin(Math.toRadians(M)));
+        double lon = E + elements[3];
+        return new double[]{lon % 360, 0.0};
+    }
+
+    public static double calculateAtmosphericRefraction(double apparentElevation) {
+        if (apparentElevation < -1.0 || apparentElevation > 90.0) return 0.0;
+        double elevRad = Math.toRadians(apparentElevation);
+        if (apparentElevation > 15.0) {
+            return 1.02 / Math.tan(elevRad) / 60.0;
+        } else if (apparentElevation > 5.0) {
+            return (1.02 * Math.tan(Math.toRadians(90 - apparentElevation)) + 
+                    0.001 * Math.pow(Math.tan(Math.toRadians(90 - apparentElevation)), 3)) / 60.0;
+        } else {
+            return (1.02 * Math.tan(Math.toRadians(90 - apparentElevation)) + 
+                    0.001 * Math.pow(Math.tan(Math.toRadians(90 - apparentElevation)), 3) +
+                    0.00005 * Math.pow(Math.tan(Math.toRadians(90 - apparentElevation)), 5)) / 60.0;
+        }
+    }
 }
