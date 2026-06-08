@@ -67,4 +67,28 @@ public class AtmosUtils {
         double windKmh = windSpeedMs * 3.6;
         return 13.12 + 0.6215 * tempC - 11.37 * Math.pow(windKmh, 0.16) + 0.3965 * tempC * Math.pow(windKmh, 0.16);
     }
+
+    public static double calculateTroposphericDelay(double altitude, double temperature, double humidity) {
+        double pressure = pressureFromAltitude(altitude);
+        double tempK = temperature + 273.15;
+        double vaporPressure = humidity / 100.0 * 6.1078 * Math.pow(10, (7.5 * temperature) / (temperature + 237.3)) * 100;
+        double dryComponent = 0.002277 * pressure;
+        double wetComponent = 0.002277 * (1255.0 / tempK + 0.05) * vaporPressure;
+        return dryComponent + wetComponent;
+    }
+
+    public static double calculateHumidityRatio(double pressure, double temperature, double relativeHumidity) {
+        double satPressure = 6.1078 * Math.pow(10, (7.5 * temperature) / (temperature + 237.3)) * 100;
+        double vaporPressure = relativeHumidity / 100.0 * satPressure;
+        return 0.622 * vaporPressure / (pressure - vaporPressure);
+    }
+
+    public static double[] calculateISAAtmosphere(double altitude) {
+        final double g0 = 9.80665;
+        final double R = 287.058;
+        double temperature = STANDARD_TEMP - LAPSE_RATE * altitude;
+        double pressure = STANDARD_PRESSURE * Math.pow(temperature / STANDARD_TEMP, g0 / (R * LAPSE_RATE));
+        double density = calculateDensity(pressure, temperature);
+        return new double[]{temperature, pressure, density};
+    }
 }
