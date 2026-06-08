@@ -85,4 +85,31 @@ public class GeoUtils {
         double angle = Math.toRadians(Math.abs(b2 - b1));
         return 0.5 * d12 * d13 * Math.sin(angle);
     }
+
+    public static double calculatePathDistance(double[][] coordinates) {
+        if (coordinates == null || coordinates.length < 2) {
+            return 0.0;
+        }
+        double totalDistance = 0.0;
+        for (int i = 0; i < coordinates.length - 1; i++) {
+            totalDistance += calculateDistance(
+                coordinates[i][0], coordinates[i][1],
+                coordinates[i + 1][0], coordinates[i + 1][1]
+            );
+        }
+        return totalDistance;
+    }
+
+    public static double calculatePolygonArea(double[][] coordinates) {
+        if (coordinates == null || coordinates.length < 3) {
+            return 0.0;
+        }
+        double area = 0.0;
+        int n = coordinates.length;
+        for (int i = 0; i < n; i++) {
+            int j = (i + 1) % n;
+            area += (coordinates[i][1] * coordinates[j][0] - coordinates[j][1] * coordinates[i][0]) * DEG_TO_RAD * DEG_TO_RAD;
+        }
+        return Math.abs(area) * 0.5 * EARTH_RADIUS * EARTH_RADIUS;
+    }
 }
