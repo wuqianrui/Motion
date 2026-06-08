@@ -1,7 +1,22 @@
 package com.motion.utils;
 
 public class SignalUtils {
+    private static final double DEFAULT_SAMPLE_RATE = 44100.0;
+    private static final int DEFAULT_WINDOW_SIZE = 256;
+    private static final double EPSILON = 1e-10;
+    private static final int MAX_FFT_SIZE = 8192;
+    
+    private static void validateInput(double[] data) {
+        if (data == null) throw new IllegalArgumentException("Data array cannot be null");
+        if (data.length == 0) throw new IllegalArgumentException("Data array cannot be empty");
+    }
+    
+    private static void validateSampleRate(double sampleRate) {
+        if (sampleRate <= 0) throw new IllegalArgumentException("Sample rate must be positive");
+    }
     public static double[] movingAverage(double[] data, int window) {
+        validateInput(data);
+        if (window <= 0) throw new IllegalArgumentException("Window size must be positive");
         double[] result = new double[data.length];
         for (int i = 0; i < data.length; i++) {
             double sum = 0;
@@ -32,6 +47,7 @@ public class SignalUtils {
     }
 
     public static double calculateRMS(double[] data) {
+        validateInput(data);
         double sum = 0;
         for (double v : data) sum += v * v;
         return Math.sqrt(sum / data.length);
@@ -53,6 +69,11 @@ public class SignalUtils {
     }
 
     public static double[] lowPassFilter(double[] data, double cutoffFreq, double sampleRate) {
+        validateInput(data);
+        validateSampleRate(sampleRate);
+        if (cutoffFreq <= 0 || cutoffFreq >= sampleRate / 2) {
+            throw new IllegalArgumentException("Invalid cutoff frequency");
+        }
         double rc = 1.0 / (2 * Math.PI * cutoffFreq);
         double dt = 1.0 / sampleRate;
         double alpha = dt / (rc + dt);
