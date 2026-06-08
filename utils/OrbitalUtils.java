@@ -63,4 +63,38 @@ public class OrbitalUtils {
         double z = r * Math.sin(i) * Math.sin(w + nu);
         return new double[]{x, y, z};
     }
+
+    public static double[][] calculateGroundTrack(double a, double e, double i, double omega, double w, double M0, double duration, double dt) {
+        int steps = (int)(duration / dt);
+        double[][] track = new double[steps][2];
+        for (int k = 0; k < steps; k++) {
+            double t = k * dt;
+            double[] result = keplerPropagate(a, e, M0, t);
+            double nu = result[0];
+            double[] pos = orbitalToCartesian(a, e, i, omega, w, nu);
+            double lat = Math.toDegrees(Math.asin(pos[2] / Math.sqrt(pos[0]*pos[0] + pos[1]*pos[1] + pos[2]*pos[2])));
+            double lon = Math.toDegrees(Math.atan2(pos[1], pos[0]));
+            track[k][0] = lat;
+            track[k][1] = lon;
+        }
+        return track;
+    }
+
+    public static double calculateJ2Perturbation(double a, double e, double i) {
+        final double J2 = 1.08263e-3;
+        final double Re = 6378137.0;
+        double n = Math.sqrt(MU / Math.pow(a, 3));
+        double raanRate = -1.5 * J2 * Math.pow(Re / a, 2) * n * Math.cos(i) / Math.pow(1 - e*e, 2);
+        double argPerigeeRate = 0.75 * J2 * Math.pow(Re / a, 2) * n * (5 * Math.pow(Math.cos(i), 2) - 1) / Math.pow(1 - e*e, 2);
+        return (raanRate + argPerigeeRate) * 180.0 / Math.PI * 86400.0;
+    }
+
+    public static double calculateOrbitalLifetime(double a, double e, double cd, double area, double mass) {
+        double altitude = a - 6378137.0;
+        if (altitude > 200000) return Double.POSITIVE_INFINITY;
+        double rho = 1.225 * Math.exp(-altitude / 8500.0);
+        double dragForce = 0.5 * rho * cd * area * Math.pow(calculateVelocity(a, a), 2);
+        double decayRate = dragForce / mass;
+        return a / decayRate / 86400.0;
+    }
 }
